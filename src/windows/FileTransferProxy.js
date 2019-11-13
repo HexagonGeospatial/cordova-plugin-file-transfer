@@ -159,7 +159,7 @@ var HTTP_E_STATUS_NOT_MODIFIED = -2145844944;
 module.exports = {
 
 /*
-exec(win, fail, 'FileTransfer', 'upload', 
+exec(win, fail, 'FileTransfer', 'upload',
 [filePath, server, fileKey, fileName, mimeType, params, trustAllHosts, chunkedMode, headers, this._id, httpMethod]);
 */
     upload: function (successCallback, errorCallback, options) {
@@ -170,7 +170,7 @@ exec(win, fail, 'FileTransfer', 'upload',
         var mimeType = options[4];
         var params = options[5];
         // var trustAllHosts = options[6]; // todo
-        // var chunkedMode = options[7]; // todo 
+        // var chunkedMode = options[7]; // todo
         var headers = options[8] || {};
         var uploadId = options[9];
         var httpMethod = options[10];
@@ -192,7 +192,7 @@ exec(win, fail, 'FileTransfer', 'upload',
         }
 
         if (filePath.indexOf("data:") === 0 && filePath.indexOf("base64") !== -1) {
-            // First a DataWriter object is created, backed by an in-memory stream where 
+            // First a DataWriter object is created, backed by an in-memory stream where
             // the data will be stored.
             var writer = Windows.Storage.Streams.DataWriter(new Windows.Storage.Streams.InMemoryRandomAccessStream());
             writer.unicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.utf8;
@@ -249,28 +249,28 @@ exec(win, fail, 'FileTransfer', 'upload',
 
             var stream;
 
-            // The call to store async sends the actual contents of the writer 
+            // The call to store async sends the actual contents of the writer
             // to the backing stream.
             writer.storeAsync().then(function () {
-                // For the in-memory stream implementation we are using, the flushAsync call 
+                // For the in-memory stream implementation we are using, the flushAsync call
                 // is superfluous, but other types of streams may require it.
                 return writer.flushAsync();
             }).then(function () {
-                // We detach the stream to prolong its useful lifetime. Were we to fail 
-                // to detach the stream, the call to writer.close() would close the underlying 
-                // stream, preventing its subsequent use by the DataReader below. Most clients 
-                // of DataWriter will have no reason to use the underlying stream after 
+                // We detach the stream to prolong its useful lifetime. Were we to fail
+                // to detach the stream, the call to writer.close() would close the underlying
+                // stream, preventing its subsequent use by the DataReader below. Most clients
+                // of DataWriter will have no reason to use the underlying stream after
                 // writer.close() is called, and will therefore have no reason to call
-                // writer.detachStream(). Note that once we detach the stream, we assume 
-                // responsibility for closing the stream subsequently; after the stream 
+                // writer.detachStream(). Note that once we detach the stream, we assume
+                // responsibility for closing the stream subsequently; after the stream
                 // has been detached, a call to writer.close() will have no effect on the stream.
                 stream = writer.detachStream();
-                // Make sure the stream is read from the beginning in the reader 
+                // Make sure the stream is read from the beginning in the reader
                 // we are creating below.
                 stream.seek(0);
-                // Most DataWriter clients will not call writer.detachStream(), 
-                // and furthermore will be working with a file-backed or network-backed stream, 
-                // rather than an in-memory-stream. In such cases, it would be particularly 
+                // Most DataWriter clients will not call writer.detachStream(),
+                // and furthermore will be working with a file-backed or network-backed stream,
+                // rather than an in-memory-stream. In such cases, it would be particularly
                 // important to call writer.close(). Doing so is always a best practice.
                 writer.close();
 
@@ -424,7 +424,7 @@ exec(win, fail, 'FileTransfer', 'upload',
             errorCallback(new FTErr(FTErr.FILE_NOT_FOUND_ERR));
             return;
         }
-        // Download to a temp file to avoid the file deletion on 304 
+        // Download to a temp file to avoid the file deletion on 304
         // CB-7006 Empty file is created on file transfer if server response is 304
         var tempFileName = '~' + fileName;
 
@@ -499,6 +499,10 @@ exec(win, fail, 'FileTransfer', 'upload',
                             if (!response) {
                                 resolve(new FTErr(FTErr.CONNECTION_ERR, source, target));
                             } else {
+                                if (download.progress.bytesReceived === 0) {
+                                    resolve(new FTErr(FTErr.FILE_NOT_FOUND_ERR, source, target, response.statusCode, null, error));
+                                    return;
+                                }
                                 var reader = new Windows.Storage.Streams.DataReader(download.getResultStreamAt(0));
                                 reader.loadAsync(download.progress.bytesReceived).then(function (bytesLoaded) {
                                     var payload = reader.readString(bytesLoaded);
