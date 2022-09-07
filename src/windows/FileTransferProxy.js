@@ -478,9 +478,9 @@ exec(win, fail, 'FileTransfer', 'upload',
                         .replace(appData.temporaryFolder.path, 'ms-appdata:///temp')
                         .replace(/\\/g, '/');
 
-                        fileProxyCallback = function(fileEntry) {
-                            successCallback({ fileEntry: fileEntry, headers: downloadOperation.operation.getResults().getResponseInformation().headers })
-                        }
+                        var fileProxyCallback = function(fileEntry) {
+                            successCallback({ fileEntry: fileEntry, headers: downloadOperation.operation.getResults().getResponseInformation().headers });
+                        };
 
                         // Passing null as error callback here because downloaded file should exist in any case
                         // otherwise the error callback will be hit during file creation in another place
