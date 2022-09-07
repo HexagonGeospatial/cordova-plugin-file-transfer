@@ -478,9 +478,13 @@ exec(win, fail, 'FileTransfer', 'upload',
                         .replace(appData.temporaryFolder.path, 'ms-appdata:///temp')
                         .replace(/\\/g, '/');
 
+                        fileProxyCallback = function(fileEntry) {
+                            successCallback({ fileEntry: fileEntry, headers: downloadOperation.operation.getResults().getResponseInformation().headers })
+                        }
+
                         // Passing null as error callback here because downloaded file should exist in any case
                         // otherwise the error callback will be hit during file creation in another place
-                        FileProxy.resolveLocalFileSystemURI(successCallback, null, [nativeURI]);
+                        FileProxy.resolveLocalFileSystemURI(fileProxyCallback, null, [nativeURI]);
                     }, function(error) {
                         errorCallback(new FTErr(FTErr.FILE_NOT_FOUND_ERR, source, target, null, null, error));
                     });
