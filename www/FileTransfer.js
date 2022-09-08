@@ -203,20 +203,21 @@ FileTransfer.prototype.download = function(source, target, successCallback, erro
                 return self.onprogress(newProgressEvent(result));
             }
         } else if (successCallback) {
+            var resultEntry = result.fileEntry;
             var entry = null;
-            if (result.isDirectory) {
+            if (resultEntry.isDirectory) {
                 entry = new (require('cordova-plugin-file.DirectoryEntry'))();
             }
-            else if (result.isFile) {
+            else if (resultEntry.isFile) {
                 entry = new (require('cordova-plugin-file.FileEntry'))();
             }
-            entry.isDirectory = result.isDirectory;
-            entry.isFile = result.isFile;
-            entry.name = result.name;
-            entry.fullPath = result.fullPath;
-            entry.filesystem = new FileSystem(result.filesystemName || (result.filesystem == window.PERSISTENT ? 'persistent' : 'temporary'));
-            entry.nativeURL = result.nativeURL;
-            successCallback(entry);
+            entry.isDirectory = resultEntry.isDirectory;
+            entry.isFile = resultEntry.isFile;
+            entry.name = resultEntry.name;
+            entry.fullPath = resultEntry.fullPath;
+            entry.filesystem = new FileSystem(resultEntry.filesystemName || (resultEntry.filesystem == window.PERSISTENT ? 'persistent' : 'temporary'));
+            entry.nativeURL = resultEntry.nativeURL;
+            successCallback({ fileEntry: entry, headers: result.headers });
         }
     };
 
