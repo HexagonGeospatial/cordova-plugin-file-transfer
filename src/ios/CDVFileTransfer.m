@@ -638,10 +638,8 @@ static CFIndex WriteDataToStream(NSData* data, CFWriteStreamRef stream)
             DLog(@"File Transfer Download success");
 
             downloadResult = [NSMutableDictionary dictionaryWithCapacity:2];
-            [downloadResult setObject:[NSMutableDictionary messageAsDictionary:[self.filePlugin makeEntryForURL:self.targetURL]] forKey:@"fileEntry"];
+            [downloadResult setObject:[self.filePlugin makeEntryForURL:self.targetURL] forKey:@"fileEntry"];
             [downloadResult setObject:self.responseHeaders forKey:@"headers"];
-
-            NSLog(@"DEBUG!: downloadResult = %@", downloadResult);
 
             result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:downloadResult];
         } else {
