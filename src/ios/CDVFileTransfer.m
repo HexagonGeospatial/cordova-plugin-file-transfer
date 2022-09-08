@@ -606,6 +606,7 @@ static CFIndex WriteDataToStream(NSData* data, CFWriteStreamRef stream)
     NSString* uploadResponse = nil;
     NSString* downloadResponse = nil;
     NSMutableDictionary* uploadResult;
+    NSMutableDictionary* downloadResult;
     CDVPluginResult* result = nil;
 
     NSLog(@"File Transfer Finished with response code %d", self.responseCode);
@@ -636,7 +637,13 @@ static CFIndex WriteDataToStream(NSData* data, CFWriteStreamRef stream)
             self.targetFileHandle = nil;
             DLog(@"File Transfer Download success");
 
-            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[self.filePlugin makeEntryForURL:self.targetURL]];
+            downloadResult = [NSMutableDictionary dictionaryWithCapacity:2];
+            [downloadResult setObject:[NSMutableDictionary messageAsDictionary:[self.filePlugin makeEntryForURL:self.targetURL]] forKey:@"fileEntry"];
+            [downloadResult setObject:self.responseHeaders forKey:@"headers"];
+
+            NSLog(@"DEBUG!: downloadResult = %@", downloadResult);
+
+            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:downloadResult];
         } else {
             downloadResponse = [[NSString alloc] initWithData:self.responseData encoding:NSUTF8StringEncoding];
             if (downloadResponse == nil) {
